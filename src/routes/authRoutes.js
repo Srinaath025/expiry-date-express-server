@@ -1,6 +1,7 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const { registerValidators, loginValidators } = require('../utils/authValidators');
+const { protect } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -138,4 +139,54 @@ router.post('/register', registerValidators, authController.register);
  */
 router.post('/login', loginValidators, authController.login);
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Log out user and clear authentication JWT cookie
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: jwtToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logged out successfully
+ */
+router.post('/logout', authController.logout);
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current authenticated user profile
+ *     tags: [Authentication]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user profile returned successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthResponse'
+ *       401:
+ *         description: Not authenticated or session expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get('/me', protect, authController.getMe);
+
 module.exports = router;
+

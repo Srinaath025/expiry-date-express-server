@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const connectDB = require('./src/config/db');
 const setupSwagger = require('./src/config/swagger');
 const authRoutes = require('./src/routes/authRoutes');
+const productRoutes = require('./src/routes/productRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -13,7 +14,10 @@ const PORT = process.env.PORT || 5001;
 connectDB();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,  // Required for HttpOnly cookie to be sent
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -23,6 +27,7 @@ setupSwagger(app);
 
 // API Routes
 app.use('/auth', authRoutes);
+app.use('/products', productRoutes);
 
 // Base Route
 app.get('/', (req, res) => {
