@@ -18,6 +18,7 @@ const authController = {
             response.cookie('jwtToken', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/'
             });
 
@@ -47,6 +48,7 @@ const authController = {
             response.cookie('jwtToken', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/'
             });
 
@@ -81,6 +83,7 @@ const authController = {
             response.clearCookie('jwtToken', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 path: '/'
             });
 
