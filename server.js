@@ -14,8 +14,30 @@ const PORT = process.env.PORT || 5001;
 connectDB();
 
 // Middlewares
+const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+const normalizeOrigin = (url) => url.replace(/\/$/, '');
+
+const allowedOrigins = [
+  normalizeOrigin(clientUrl),
+  'http://localhost:5173',
+  'http://localhost:5001'
+];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    
+    const normalizedOrigin = normalizeOrigin(origin);
+    const isAllowed = allowedOrigins.some(allowed => normalizeOrigin(allowed) === normalizedOrigin);
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,  // Required for HttpOnly cookie to be sent
 }));
 app.use(express.json());
